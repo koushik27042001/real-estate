@@ -3,15 +3,31 @@ const jwt = require('jsonwebtoken');
 const auth = (req, res, next) => {
     const authHeader = req.header('Authorization');
     const token = authHeader ? authHeader.replace('Bearer ', '') : null;
+
     if (!token) {
         return res.status(401).json({ message: 'No token, authorization denied' });
     }
+
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secretkey');
-        req.user = decoded;
+        const secret = process.env.JWT_SECRET || 'secretkey';
+        const decoded = jwt.verify(token, secret);
+
+        // Handle both token formats: { user: {...} } and direct { id, role }
+        req.user = decoded.user || decoded;
+
+        // normalize role to lowercase to avoid case mismatches
+        if (req.user && req.user.role) {
+            req.user.role = String(req.user.role).toLowerCase();
+        }
+
+        if (!req.user.id) {
+            return res.status(401).json({ message: 'Invalid token structure' });
+        }
+
         next();
     } catch (err) {
-        res.status(401).json({ message: 'Token is not valid' });
+        console.error('JWT verification error:', err.message);
+        res.status(401).json({ message: 'Token is not valid: ' + err.message });
     }
 };
 

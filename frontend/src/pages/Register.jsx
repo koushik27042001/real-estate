@@ -1,14 +1,13 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import Input from "../components/common/Input";
 import Button from "../components/common/Button";
-import { API_BASE_URL } from '../utils/constants';
 
 export default function Register() {
   const [formData, setFormData] = useState({ name: '', email: '', password: '', role: 'buyer' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const { register } = useAuth();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -20,23 +19,9 @@ export default function Register() {
     setError('');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        navigate(`/dashboard/${data.user.role}`);
-      } else {
-        setError(data.message || 'Registration failed');
-      }
+      await register(formData.name, formData.email, formData.password, formData.role);
     } catch (err) {
-      setError('Network error');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -80,8 +65,8 @@ export default function Register() {
             className="border border-gray-300 rounded px-3 py-2 w-full"
           >
             <option value="buyer">Buyer</option>
-            <option value="owner">Owner</option>
-            <option value="tenant">Tenant</option>
+            <option value="seller">Seller</option>
+            <option value="agent">Agent</option>
             <option value="admin">Admin</option>
           </select>
         </div>

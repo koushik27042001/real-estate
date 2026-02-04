@@ -1,23 +1,8 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Navbar() {
-  const [user, setUser] = useState(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setUser(null);
-    navigate('/');
-  };
+  const { user, logout } = useAuth();
 
   return (
     <nav className="bg-white shadow p-4 flex justify-between items-center">
@@ -32,7 +17,7 @@ export default function Navbar() {
             <Link to={`/dashboard/${user.role}`} className="text-blue-600">
               Dashboard ({user.role})
             </Link>
-            <button onClick={handleLogout} className="text-red-600">
+            <button onClick={logout} className="text-red-600">
               Logout
             </button>
           </>

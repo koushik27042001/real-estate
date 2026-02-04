@@ -1,16 +1,28 @@
+import React, { useState, useEffect } from 'react';
 import PropertyList from "../components/property/PropertyList";
-
-const dummyData = [
-  { id: 1, title: "2 BHK Apartment", location: "Bangalore", price: "75 Lakh" },
-  { id: 2, title: "3 BHK Villa", location: "Hyderabad", price: "1.2 Cr" },
-  { id: 3, title: "1 BHK Flat", location: "Pune", price: "45 Lakh" },
-];
+import { getProperties } from '../services/propertyService';
 
 export default function Properties() {
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProperties = async () => {
+      const result = await getProperties();
+      setProperties(result);
+      setLoading(false);
+    };
+    fetchProperties();
+  }, []);
+
+  if (loading) {
+    return <p>Loading properties...</p>;
+  }
+
   return (
     <>
       <h1 className="text-2xl font-bold mb-6">All Properties</h1>
-      <PropertyList properties={dummyData} />
+      <PropertyList properties={properties} />
     </>
   );
 }

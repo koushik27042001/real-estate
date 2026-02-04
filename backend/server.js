@@ -2,13 +2,17 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
 const authRoutes = require('./routes/auth');
+const propertyRoutes = require('./routes/properties');
+const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Database connection
 mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/real-estate', {
@@ -19,7 +23,11 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/real-estate
     .catch(err => console.log(err));
 
 // Routes
-app.use('/api/auth', authRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/properties', propertyRoutes);
+
+// Error handling middleware
+app.use(errorHandler);
 
 // Basic route
 app.get('/', (req, res) => {

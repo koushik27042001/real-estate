@@ -1,14 +1,13 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import Input from "../components/common/Input";
 import Button from "../components/common/Button";
-import { API_BASE_URL } from '../utils/constants';
 
 export default function Login() {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -20,23 +19,9 @@ export default function Login() {
     setError('');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        navigate(`/dashboard/${data.user.role}`);
-      } else {
-        setError(data.message || 'Login failed');
-      }
+      await login(formData.email, formData.password);
     } catch (err) {
-      setError('Network error');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
