@@ -13,6 +13,7 @@ import OwnerDashboard from '../pages/OwnerDashboard';
 import AdminDashboard from '../pages/AdminDashboard';
 import TenantDashboard from '../pages/TenantDashboard';
 import MainLayout from '../layouts/MainLayout';
+import PostProperty from '../pages/PostProperty';
 
 const AppRoutes = () => {
   return (
@@ -26,6 +27,7 @@ const AppRoutes = () => {
             <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/postproperty" element={<PostProperty />} />
             <Route path="/dashboard/buyer" element={<ProtectedRoute allowedRoles={['buyer']}><BuyerDashboard /></ProtectedRoute>} />
             <Route path="/dashboard/seller" element={<ProtectedRoute allowedRoles={['seller']}><OwnerDashboard /></ProtectedRoute>} />
             <Route path="/dashboard/agent" element={<ProtectedRoute allowedRoles={['agent']}><TenantDashboard /></ProtectedRoute>} />
