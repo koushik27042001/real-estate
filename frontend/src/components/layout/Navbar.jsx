@@ -12,6 +12,7 @@ export default function Navbar() {
 
       <div className="space-x-4 flex items-center">
         <Link to="/properties">Properties</Link>
+        {(!user || user.role === 'buyer') && <Link to="/wishlist">Wishlist</Link>}
         {user ? (
           <>
             <Link to={`/dashboard/${user.role}`} className="text-blue-600">

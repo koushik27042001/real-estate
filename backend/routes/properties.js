@@ -43,13 +43,38 @@ router.get('/', async(req, res) => {
     }
 });
 
-// Get property by ID
+
+
+// Inquire about a property (any user / guest can send an inquiry)
+router.post('/:id/inquire', async(req, res) => {
+    try {
+        const { name, email, message } = req.body;
+        const property = await Property.findById(req.params.id);
+        if (!property) return res.status(404).json({ message: 'Property not found' });
+
+        property.inquiries = property.inquiries || [];
+        property.inquiries.push({ name, email, message });
+        await property.save();
+
+        res.json({ message: 'Inquiry submitted' });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Get property by ID (increments visitorCount)
 router.get('/:id', async(req, res) => {
     try {
         const property = await Property.findById(req.params.id).populate('owner', 'name email');
         if (!property) {
             return res.status(404).json({ message: 'Property not found' });
         }
+
+        // increment visitor count
+        property.visitorCount = (property.visitorCount || 0) + 1;
+        await property.save();
+
         res.json(property);
     } catch (err) {
         res.status(500).json({ message: 'Server error' });

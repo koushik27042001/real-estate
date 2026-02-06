@@ -5,6 +5,7 @@ const cors = require('cors');
 const path = require('path');
 const authRoutes = require('./routes/auth');
 const propertyRoutes = require('./routes/properties');
+const wishlistRoutes = require('./routes/wishlist');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -25,6 +26,7 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/real-estate
 // Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/properties', propertyRoutes);
+app.use('/api/v1/wishlist', wishlistRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

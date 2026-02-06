@@ -12,6 +12,13 @@ const propertySchema = new mongoose.Schema({
     images: [{ type: String }], // array of image URLs or paths
     owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     status: { type: String, enum: ['available', 'sold', 'rented'], default: 'available' },
+    visitorCount: { type: Number, default: 0 },
+    inquiries: [{
+        name: { type: String },
+        email: { type: String },
+        message: { type: String },
+        createdAt: { type: Date, default: Date.now }
+    }],
     createdAt: { type: Date, default: Date.now }
 });
 

@@ -5,6 +5,7 @@ import ProtectedRoute from '../components/common/ProtectedRoute';
 import Home from '../pages/Home';
 import Properties from '../pages/Properties';
 import PropertyDetails from '../pages/PropertyDetails';
+import Wishlist from '../pages/Wishlist';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import BuyerDashboard from '../pages/BuyerDashboard';
@@ -22,6 +23,7 @@ const AppRoutes = () => {
             <Route path="/" element={<Home />} />
             <Route path="/properties" element={<Properties />} />
             <Route path="/property/:id" element={<PropertyDetails />} />
+            <Route path="/wishlist" element={<Wishlist />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/dashboard/buyer" element={<ProtectedRoute allowedRoles={['buyer']}><BuyerDashboard /></ProtectedRoute>} />

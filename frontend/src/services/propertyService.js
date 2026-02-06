@@ -81,3 +81,12 @@ export const getPropertiesByOwner = async(ownerId) => {
     const response = await fetch(`${API_BASE_URL}/properties/owner/${ownerId}`);
     return response.json();
 };
+
+export const inquireProperty = async(propertyId, data) => {
+    const response = await fetch(`${API_BASE_URL}/properties/${propertyId}/inquire`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    });
+    return response.json();
+};
