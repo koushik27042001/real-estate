@@ -8,18 +8,34 @@ export default function PropertyDetails() {
   const { id } = useParams();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProperty = async () => {
-      const result = await getPropertyById(id);
-      setProperty(result);
-      setLoading(false);
+      try {
+        const result = await getPropertyById(id);
+        if (result && result.error) {
+          setError(result.error);
+          setProperty(null);
+        } else {
+          setProperty(result);
+        }
+      } catch (err) {
+        setError("Failed to load property details.");
+        setProperty(null);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchProperty();
   }, [id]);
 
   if (loading) {
     return <p>Loading property details...</p>;
+  }
+
+  if (error) {
+    return <p className="text-red-600">{error}</p>;
   }
 
   if (!property) {
@@ -45,7 +61,7 @@ export default function PropertyDetails() {
       <p>Bedrooms: {property.bedrooms}</p>
       <p>Bathrooms: {property.bathrooms}</p>
       <p>Area: {property.area} sq ft</p>
-      <p>Owner: {property.owner.name}</p>
+      <p>Owner: {property.owner?.name || "Not available"}</p>
 
       <ContactForm propertyId={id} />
     </div>

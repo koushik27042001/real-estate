@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { ChevronDown, Headphones, User, Menu, X } from 'lucide-react';
+import { ChevronDown, Headphones, User, Menu, X, ChevronRight, Search } from 'lucide-react';
 import LocationDropdown from './Navbar_component/LocationDropdown';
 import MegaMenu from './for_buyers/MegaMenu';
 import { buyerMenu } from './for_buyers/menuConfig';
@@ -232,48 +232,6 @@ const Navbar = () => {
           </div>
         </div>
 
-        {/* --- MOBILE MENU OVERLAY --- */}
-        <div 
-            className={`fixed inset-0 z-[100] transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
-        >
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)}></div>
-            <div className={`absolute right-0 top-0 h-full w-[85%] max-w-[320px] bg-slate-50 shadow-2xl transition-transform duration-300 transform ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-                <div className="flex items-center justify-between border-b border-gray-200 bg-white px-5 py-4">
-                    <div className="flex items-center gap-2 text-sm font-bold text-blue-700">
-                        <User className="w-5 h-5" />
-                        <span>LOGIN / REGISTER</span>
-                    </div>
-                    <button onClick={() => setMobileMenuOpen(false)} className="text-gray-600 hover:text-gray-900">
-                        <X className="w-6 h-6" />
-                    </button>
-                </div>
-                
-                <div className="overflow-y-auto h-[calc(100%-60px)]">
-                    {/* Mobile Menu CTA Banner */}
-                    <div className="m-4 rounded-xl border border-amber-100 bg-[#FFF8E1] p-4">
-                       <div>
-                          <div className="text-sm font-bold text-gray-900">Sell or Rent faster!</div>
-                          <div className="text-xs text-gray-600">List your property for FREE</div>
-                       </div>
-                       <button className="mt-3 w-full rounded bg-blue-600 px-3 py-2 text-xs font-bold text-white">Post Property</button>
-                    </div>
-
-                    {/* Links */}
-                    <div className="px-4 py-2">
-                       {['For Buyers', 'For Tenants', 'For Owners', 'For Dealers'].map((link) => (
-                           <div key={link} className="flex items-center justify-between py-4 text-base font-semibold text-gray-900 border-b border-gray-200 cursor-pointer group">
-                               {link}
-                               <ChevronDown className="w-4 h-4 text-gray-500 transition-transform group-hover:rotate-180" />
-                           </div>
-                       ))}
-                       <div className="py-4 text-base font-semibold text-gray-900">
-                         Insights <span className="ml-2 rounded bg-blue-50 px-1 text-[10px] text-blue-700">NEW</span>
-                       </div>
-                       <div className="py-4 text-base font-semibold text-gray-900">Articles & News</div>
-                    </div>
-                </div>
-            </div>
-        </div>
         <MegaMenu
           open={activeMenu === "buyers"}
           activeCategory={activeCategory}
@@ -303,6 +261,96 @@ const Navbar = () => {
           onMouseLeave={scheduleClose}
         />
       </header>
+
+      {/* --- MOBILE MENU OVERLAY --- */}
+      <div
+        className={`fixed inset-0 z-[120] transition-opacity duration-300 ${mobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+      >
+        <div className="absolute inset-0 bg-black/60" onClick={() => setMobileMenuOpen(false)}></div>
+        <div
+          className={`absolute right-0 top-0 h-full w-[340px] max-w-[90%] bg-white text-gray-800 shadow-2xl transition-transform duration-300 transform ${
+            mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+        >
+          <div className="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
+            <div className="flex items-center gap-2 text-[12px] font-bold text-blue-700">
+              <User className="h-4 w-4 text-gray-500" />
+              <span>LOGIN / REGISTER</span>
+            </div>
+            <button onClick={() => setMobileMenuOpen(false)} className="text-gray-500 hover:text-gray-900">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          <div className="h-[calc(100%-48px)] overflow-y-auto">
+            <div className="px-4 pt-4">
+              <div className="rounded-lg border-2 border-[#0f2d2e]/80 bg-[#dff3e9] p-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-[13px] font-semibold text-gray-900">Sell or rent faster at the right price!</div>
+                    <button className="mt-2 rounded bg-[#1a73e8] px-3 py-1.5 text-[12px] font-bold text-white">
+                      Post Property
+                    </button>
+                  </div>
+                  <img
+                    className="h-[66px] w-[66px] object-contain"
+                    src="/universalapp/img/hp_ppf_banner.png"
+                    alt="Post Property"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="px-4">
+              <div className="border-b border-gray-200 py-4 text-[13px] font-semibold text-gray-700">
+                Explore our Services
+              </div>
+
+              {['For Buyers', 'For Tenants', 'For Owners', 'For Dealers / Builders'].map((item) => (
+                <div key={item} className="flex items-center justify-between border-b border-gray-200 py-3 text-[13px] text-gray-800">
+                  <span>{item}</span>
+                  <ChevronRight className="h-4 w-4 text-gray-400" />
+                </div>
+              ))}
+
+              <div className="border-b border-gray-200 py-4 text-[13px] font-semibold text-gray-800">Home Loans</div>
+              <div className="flex items-center justify-between border-b border-gray-200 py-3 text-[13px] text-gray-800">
+                <span className="flex items-center gap-2">
+                  Insights
+                  <span className="rounded bg-[#004E8F] px-1.5 py-0.5 text-[9px] font-bold text-white">NEW</span>
+                </span>
+                <ChevronRight className="h-4 w-4 text-gray-400" />
+              </div>
+              <div className="flex items-center justify-between border-b border-gray-200 py-3 text-[13px] text-gray-800">
+                <span>Articles & News</span>
+                <ChevronRight className="h-4 w-4 text-gray-400" />
+              </div>
+
+              <div className="border-b border-gray-200 py-4 text-[13px] font-semibold text-gray-800">About Us</div>
+              <div className="flex items-center justify-between border-b border-gray-200 py-3 text-[13px] text-gray-800">
+                <span>Get Help</span>
+                <ChevronRight className="h-4 w-4 text-gray-400" />
+              </div>
+              <div className="border-b border-gray-200 py-3 text-[13px] text-gray-800">Download App</div>
+            </div>
+
+            <div className="px-4 pb-6 pt-5">
+              <div className="flex items-center gap-2 rounded-md border border-gray-200 bg-[#f7f8fa] px-3 py-2">
+                <input
+                  type="text"
+                  placeholder="Search by Property Code"
+                  className="w-full bg-transparent text-[12px] text-gray-700 outline-none"
+                />
+                <Search className="h-4 w-4 text-gray-500" />
+              </div>
+              <div className="mt-4 text-[12px] text-gray-700">
+                Toll Free Number: 1800 41 99099.
+              </div>
+              <div className="text-[12px] text-gray-600">For international numbers click here</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <LocationDropdown open={locationOpen} onClose={() => setLocationOpen(false)} />
     </>

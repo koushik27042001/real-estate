@@ -1,32 +1,75 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  Box,
+  Button,
+  Card,
+  Chip,
+  Container,
+  FormControl,
+  InputAdornment,
+  MenuItem,
+  Select,
+  Stack,
+  Tab,
+  Tabs,
+  TextField,
+  Typography,
+  useMediaQuery,
+} from "@mui/material";
+import { styled, useTheme } from "@mui/material/styles";
+import SearchIcon from "@mui/icons-material/Search";
+import MicIcon from "@mui/icons-material/Mic";
+import NearMeIcon from "@mui/icons-material/NearMe";
+
+const Hero = styled(Box)(({ theme }) => ({
+  position: "relative",
+  overflow: "hidden",
+  paddingTop: theme.spacing(10),
+  paddingBottom: theme.spacing(10),
+  background: "linear-gradient(90deg, #0b2a5f 0%, #1d4ed8 100%)",
+  color: theme.palette.common.white,
+}));
+
+const HeroBackdrop = styled(Box)(() => ({
+  position: "absolute",
+  inset: 0,
+  backgroundImage:
+    "linear-gradient(180deg, rgba(11,42,95,0.85), rgba(11,42,95,0.4)), url('https://images.unsplash.com/photo-1489515217757-5fd1be406fef')",
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  opacity: 0.7,
+}));
 
 export default function Home() {
   const navigate = useNavigate();
-  const [city, setCity] = useState("");
-  const [ptype, setPtype] = useState("");
-  const [budget, setBudget] = useState("");
+  const theme = useTheme();
+  const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
+
+  const [activeTab, setActiveTab] = useState("buy");
+  const [propertyCategory, setPropertyCategory] = useState("All Residential");
+  const [query, setQuery] = useState("");
 
   const featured = [
     {
       id: 1,
       title: "Luxury Apartment",
       location: "Bangalore, India",
-      price: "₹85 Lakhs",
+      price: "INR 85 Lakhs",
       img: "https://images.unsplash.com/photo-1570129477492-45c003edd2be",
     },
     {
       id: 2,
       title: "Modern Villa",
       location: "Goa, India",
-      price: "₹2.1 Cr",
+      price: "INR 2.1 Cr",
       img: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c",
     },
     {
       id: 3,
       title: "Cozy Studio",
       location: "Mumbai, India",
-      price: "₹45 Lakhs",
+      price: "INR 45 Lakhs",
       img: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2",
     },
   ];
@@ -34,183 +77,319 @@ export default function Home() {
   function onSearch(e) {
     e.preventDefault();
     const params = new URLSearchParams();
-    if (city) params.set("city", city);
-    if (ptype) params.set("type", ptype);
-    if (budget) params.set("budget", budget);
+    if (activeTab) params.set("mode", activeTab);
+    if (propertyCategory) params.set("category", propertyCategory);
+    if (query) params.set("q", query);
     navigate(`/properties?${params.toString()}`);
   }
 
+  function handleNearMe() {
+    if (!navigator.geolocation) {
+      window.alert("Geolocation not supported");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const params = new URLSearchParams();
+        params.set("lat", latitude);
+        params.set("lng", longitude);
+        params.set("near", "true");
+        navigate(`/properties?${params.toString()}`);
+      },
+      () => {
+        window.alert("Location permission denied");
+      }
+    );
+  }
+
+  function handleVoiceSearch() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      window.alert("Voice search not supported");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-IN";
+    recognition.start();
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      const params = new URLSearchParams();
+      params.set("query", transcript);
+      navigate(`/properties?${params.toString()}`);
+    };
+
+    recognition.onerror = () => {
+      window.alert("Voice recognition error");
+    };
+  }
+
+  const tabs = [
+    { value: "buy", label: "Buy" },
+    { value: "rent", label: "Rent" },
+    { value: "new launch", label: "New Launch", dot: true },
+    { value: "commercial", label: "Commercial" },
+    { value: "plots/land", label: "Plots/Land" },
+    { value: "projects", label: "Projects" },
+    { value: "post property (free)", label: "Post Property", free: true },
+  ];
+
+  const placeholders = {
+    buy: 'Search "3 BHK for sale in Mumbai"',
+    rent: 'Search "2 BHK for rent in Pune"',
+    "new launch": 'Search "New launch in Hyderabad"',
+    commercial: 'Search "Office space in Bengaluru"',
+    "plots/land": 'Search "Land in Gurgaon"',
+    projects: 'Search "Ready to move projects"',
+    "post property (free)": "Post your property for free",
+  };
+
+  const activeIndex = useMemo(
+    () => Math.max(0, tabs.findIndex((tab) => tab.value === activeTab)),
+    [activeTab, tabs]
+  );
+
   return (
-    <div>
-      {/* ================= HERO ================= */}
-      <section className="relative flex min-h-screen items-center justify-center bg-[url('https://images.unsplash.com/photo-1568605114967-8130f3a36994')] bg-cover bg-center pt-20">
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-black/50" />
+    <Box>
+      <Hero>
+        <HeroBackdrop />
+        <Container sx={{ position: "relative", zIndex: 1 }}>
+          <Stack spacing={2} alignItems={{ xs: "flex-start", md: "center" }} textAlign={{ xs: "left", md: "center" }}>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Chip label="99acres Property Expo" color="default" sx={{ bgcolor: "rgba(255,255,255,0.12)", color: "white" }} />
+              <Chip label="SELL" size="small" sx={{ bgcolor: "#FBBF24", fontWeight: 700 }} />
+              <Chip label="BUY" size="small" sx={{ bgcolor: "#FBBF24", fontWeight: 700 }} />
+              <Chip label="PAY MORE GET EXTRA" size="small" sx={{ bgcolor: "#FBBF24", fontWeight: 700 }} />
+            </Stack>
+            <Typography variant="subtitle2" sx={{ opacity: 0.8 }}>
+              Supported by: HDFC, SBI, ICICI
+            </Typography>
+            <Typography variant="subtitle2" sx={{ opacity: 0.9 }}>
+              Mumbai, Delhi, Bengaluru | 10-12 Nov
+            </Typography>
+            <Chip label="Limited time offer" color="error" size="small" sx={{ fontWeight: 700 }} />
+          </Stack>
+        </Container>
 
-        <div className="relative z-10 w-full max-w-4xl px-6 text-center text-white">
-          <h2 className="text-4xl font-bold md:text-5xl">Find Your Dream Home</h2>
+        <Container sx={{ position: "relative", zIndex: 2, mt: 6 }}>
+          <Card elevation={12} sx={{ borderRadius: 3, p: { xs: 2, md: 3 } }}>
+            <Box id="inPageSearchForm" className="InPageTabs" sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <Tabs
+                value={activeIndex}
+                onChange={(_, value) => setActiveTab(tabs[value].value)}
+                variant="scrollable"
+                scrollButtons="auto"
+                TabIndicatorProps={{ sx: { height: 3, borderRadius: 2 } }}
+              >
+                {tabs.map((tab) => (
+                  <Tab
+                    key={tab.value}
+                    id={`inPageSearchForm_${tab.value}`}
+                    label={
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Typography variant="body2" fontWeight={600}>
+                          {tab.label}
+                        </Typography>
+                        {tab.dot ? <Box className="tab__redDot" sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "error.main" }} /> : null}
+                        {tab.free ? (
+                          <Chip label="Free" size="small" color="success" sx={{ height: 18, fontSize: 10, fontWeight: 700 }} />
+                        ) : null}
+                      </Stack>
+                    }
+                  />
+                ))}
+              </Tabs>
+            </Box>
 
-          <p className="mt-4 text-lg text-gray-200">
-            A modern marketplace connecting buyers, renters, owners and agents — browse verified
-            listings, compare prices and connect directly with sellers.
-          </p>
+            <Box component="form" onSubmit={onSearch} sx={{ mt: 2 }}>
+              <Stack direction={{ xs: "column", md: "row" }} spacing={2} alignItems={{ md: "center" }}>
+                <FormControl sx={{ minWidth: { xs: "100%", md: 220 } }} size="small">
+                  <Select
+                    value={propertyCategory}
+                    onChange={(e) => setPropertyCategory(e.target.value)}
+                    displayEmpty
+                  >
+                    <MenuItem value="All Residential">All Residential</MenuItem>
+                    <MenuItem value="Residential Project">Residential Project</MenuItem>
+                    <MenuItem value="Apartment">Apartment</MenuItem>
+                    <MenuItem value="Villa">Villa</MenuItem>
+                    <MenuItem value="Plot/Land">Plot/Land</MenuItem>
+                    <MenuItem value="Commercial">Commercial</MenuItem>
+                  </Select>
+                </FormControl>
 
-          {/* Search Box (functional) */}
-          <form onSubmit={onSearch} className="mt-8 grid gap-4 rounded-xl bg-white p-4 md:grid-cols-4">
-            <input
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              className="rounded border p-3 text-gray-800"
-              placeholder="Enter city or locality"
-              aria-label="City or locality"
-            />
+                <TextField
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder={placeholders[activeTab]}
+                  fullWidth
+                  size="small"
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon fontSize="small" />
+                      </InputAdornment>
+                    ),
+                  }}
+                />
 
-            <select
-              value={ptype}
-              onChange={(e) => setPtype(e.target.value)}
-              className="rounded border p-3 text-gray-800"
-              aria-label="Property type"
-            >
-              <option value="">Property Type</option>
-              <option value="apartment">Apartment</option>
-              <option value="villa">Villa</option>
-              <option value="plot">Plot</option>
-              <option value="studio">Studio</option>
-            </select>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<NearMeIcon />}
+                  className="pageComponent inPageSearchBox__nearMe"
+                  onClick={handleNearMe}
+                >
+                  Near Me
+                </Button>
 
-            <select
-              value={budget}
-              onChange={(e) => setBudget(e.target.value)}
-              className="rounded border p-3 text-gray-800"
-              aria-label="Budget"
-            >
-              <option value="">Budget</option>
-              <option value="0-50">₹0 - ₹50L</option>
-              <option value="50-100">₹50L - ₹1Cr</option>
-              <option value="100+">₹1Cr+</option>
-            </select>
+                <Button variant="outlined" size="small" startIcon={<MicIcon />} onClick={handleVoiceSearch}>
+                  Voice Search
+                </Button>
 
-            <button
-              type="submit"
-              className="flex items-center justify-center rounded bg-blue-600 font-semibold text-white hover:bg-blue-700"
-            >
-              Search
-            </button>
-          </form>
-        </div>
-      </section>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  size="small"
+                  sx={{ minWidth: isMdUp ? 160 : "100%" }}
+                >
+                  Search
+                </Button>
+              </Stack>
+            </Box>
+          </Card>
+        </Container>
+      </Hero>
 
-      {/* ================= FEATURED PROPERTIES ================= */}
-      <section className="mx-auto max-w-7xl px-6 py-16">
-        <div className="flex items-center justify-between">
-          <h3 className="mb-8 text-3xl font-bold text-gray-800">Featured Properties</h3>
-          <Link to="/properties" className="text-sm font-medium text-blue-600 hover:underline">
-            Explore all properties →
-          </Link>
-        </div>
+      <Container sx={{ py: 8 }}>
+        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
+          <Typography variant="h4" fontWeight={700}>
+            Featured Properties
+          </Typography>
+          <Button component={Link} to="/properties" variant="text">
+            Explore all properties -&gt;
+          </Button>
+        </Stack>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
           {featured.map((p) => (
-            <article key={p.id} className="overflow-hidden rounded-xl bg-white shadow hover:shadow-lg transition">
-              <Link to={`/property/${p.id}`} className="block">
-                <img src={p.img} className="h-48 w-full object-cover" alt={p.title} />
-
-                <div className="p-5">
-                  <h4 className="text-lg font-semibold">{p.title}</h4>
-                  <p className="text-sm text-gray-500">{p.location}</p>
-                  <p className="mt-2 font-bold text-blue-600">{p.price}</p>
-                </div>
-              </Link>
-            </article>
+            <Card key={p.id} sx={{ flex: 1, overflow: "hidden" }}>
+              <Box
+                component={Link}
+                to={`/property/${p.id}`}
+                sx={{ textDecoration: "none", color: "inherit" }}
+              >
+                <Box component="img" src={p.img} alt={p.title} sx={{ width: "100%", height: 200, objectFit: "cover" }} />
+                <Box sx={{ p: 2.5 }}>
+                  <Typography variant="h6" fontWeight={600}>
+                    {p.title}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {p.location}
+                  </Typography>
+                  <Typography variant="subtitle1" fontWeight={700} color="primary" sx={{ mt: 1 }}>
+                    {p.price}
+                  </Typography>
+                </Box>
+              </Box>
+            </Card>
           ))}
-        </div>
-      </section>
+        </Stack>
+      </Container>
 
-      {/* ================= WHY CHOOSE US ================= */}
-      <section className="bg-white py-16">
-        <div className="mx-auto max-w-7xl px-6">
-          <h3 className="mb-10 text-center text-3xl font-bold text-gray-800">Why Choose Our Platform?</h3>
+      <Box sx={{ bgcolor: "white", py: 8 }}>
+        <Container>
+          <Typography variant="h4" fontWeight={700} textAlign="center" sx={{ mb: 5 }}>
+            Why Choose Our Platform?
+          </Typography>
 
-          <div className="grid gap-8 md:grid-cols-3">
-            <div className="text-center">
-              <h4 className="text-xl font-semibold">Verified Listings</h4>
-              <p className="mt-2 text-gray-600">All listings are verified by our team.</p>
-            </div>
+          <Stack direction={{ xs: "column", md: "row" }} spacing={4}>
+            <Box textAlign="center" flex={1}>
+              <Typography variant="h6" fontWeight={600}>
+                Verified Listings
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                All listings are verified by our team.
+              </Typography>
+            </Box>
 
-            <div className="text-center">
-              <h4 className="text-xl font-semibold">Transparent Pricing</h4>
-              <p className="mt-2 text-gray-600">Clear fees and no hidden charges.</p>
-            </div>
+            <Box textAlign="center" flex={1}>
+              <Typography variant="h6" fontWeight={600}>
+                Transparent Pricing
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                Clear fees and no hidden charges.
+              </Typography>
+            </Box>
 
-            <div className="text-center">
-              <h4 className="text-xl font-semibold">Trusted Agents</h4>
-              <p className="mt-2 text-gray-600">Work with certified local agents.</p>
-            </div>
-          </div>
+            <Box textAlign="center" flex={1}>
+              <Typography variant="h6" fontWeight={600}>
+                Trusted Agents
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                Work with certified local agents.
+              </Typography>
+            </Box>
+          </Stack>
 
-          <div className="mt-10 flex flex-col items-center justify-center gap-6 md:flex-row">
-            <div className="flex gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-gray-800">25k+</div>
-                <div className="text-sm text-gray-500">Listings</div>
-              </div>
+          <Stack direction={{ xs: "column", md: "row" }} spacing={4} alignItems="center" justifyContent="center" sx={{ mt: 6 }}>
+            <Stack direction="row" spacing={4}>
+              <Box textAlign="center">
+                <Typography variant="h4" fontWeight={700}>
+                  25k+
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Listings
+                </Typography>
+              </Box>
 
-              <div className="text-center">
-                <div className="text-3xl font-bold text-gray-800">50k+</div>
-                <div className="text-sm text-gray-500">Happy Customers</div>
-              </div>
+              <Box textAlign="center">
+                <Typography variant="h4" fontWeight={700}>
+                  50k+
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Happy Customers
+                </Typography>
+              </Box>
 
-              <div className="text-center">
-                <div className="text-3xl font-bold text-gray-800">4.8/5</div>
-                <div className="text-sm text-gray-500">Average Rating</div>
-              </div>
-            </div>
+              <Box textAlign="center">
+                <Typography variant="h4" fontWeight={700}>
+                  4.8/5
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Average Rating
+                </Typography>
+              </Box>
+            </Stack>
 
-            <div className="mt-4 md:mt-0">
-              <div className="flex items-center gap-3">
-                <img
-                  src="https://placehold.co/140x48?text=Partner+1"
-                  alt="partner 1"
-                  className="h-8 w-auto opacity-80"
-                />
-                <img
-                  src="https://placehold.co/140x48?text=Partner+2"
-                  alt="partner 2"
-                  className="h-8 w-auto opacity-80"
-                />
-                <img
-                  src="https://placehold.co/140x48?text=Partner+3"
-                  alt="partner 3"
-                  className="h-8 w-auto opacity-80"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Box component="img" src="https://placehold.co/140x48?text=Partner+1" alt="partner 1" sx={{ height: 32 }} />
+              <Box component="img" src="https://placehold.co/140x48?text=Partner+2" alt="partner 2" sx={{ height: 32 }} />
+              <Box component="img" src="https://placehold.co/140x48?text=Partner+3" alt="partner 3" sx={{ height: 32 }} />
+            </Stack>
+          </Stack>
+        </Container>
+      </Box>
 
-      {/* ================= CTA ================= */}
-      <section className="bg-blue-600 py-16 text-center text-white">
-        <h3 className="text-3xl font-bold">Ready to Sell or Rent Your Property?</h3>
-
-        <p className="mt-3">List your property and reach thousands of buyers</p>
-
-        <div className="mt-6 flex flex-col items-center gap-4 md:flex-row md:justify-center">
-          <Link
-            to="/register?role=owner"
-            className="inline-block rounded-lg bg-white px-6 py-3 font-semibold text-blue-600 hover:bg-gray-100"
-          >
+      <Box sx={{ bgcolor: "primary.main", color: "white", py: 8, textAlign: "center" }}>
+        <Typography variant="h4" fontWeight={700}>
+          Ready to Sell or Rent Your Property?
+        </Typography>
+        <Typography variant="body1" sx={{ mt: 2, opacity: 0.9 }}>
+          List your property and reach thousands of buyers
+        </Typography>
+        <Stack direction={{ xs: "column", md: "row" }} spacing={2} justifyContent="center" sx={{ mt: 3 }}>
+          <Button component={Link} to="/register?role=owner" variant="contained" color="inherit">
             Register as Owner
-          </Link>
-
-          <Link
-            to="/register?role=agent"
-            className="inline-block rounded-lg border border-white px-6 py-3 font-semibold text-white hover:bg-white/10"
-          >
+          </Button>
+          <Button component={Link} to="/register?role=agent" variant="outlined" color="inherit">
             Register as Agent
-          </Link>
-        </div>
-      </section>
-    </div>
+          </Button>
+        </Stack>
+      </Box>
+    </Box>
   );
 }
