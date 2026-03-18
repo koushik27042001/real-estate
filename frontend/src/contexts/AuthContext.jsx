@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email, password, redirectTo = null) => {
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -37,13 +37,14 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
-      navigate(`/dashboard/${data.user.role}`);
+      navigate(redirectTo || `/dashboard/${data.user.role}`);
     } else {
-      throw new Error(data.message || 'Login failed');
+      const errMsg = data.message || (data.errors?.[0]?.msg) || 'Login failed';
+      throw new Error(errMsg);
     }
   };
 
-  const register = async (name, email, password, role = 'buyer') => {
+  const register = async (name, email, password, role = 'buyer', redirectTo = null) => {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -51,14 +52,15 @@ export const AuthProvider = ({ children }) => {
     });
     const data = await response.json();
     if (response.ok) {
-      const normalizedRole = getRouteRole(data.user.role || role);
-      data.user.role = normalizedRole;
+      const normalizedRole = getRouteRole(data.user?.role || role);
+      if (data.user) data.user.role = normalizedRole;
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       setUser(data.user);
-      navigate(`/dashboard/${data.user.role}`);
+      navigate(redirectTo || `/dashboard/${normalizedRole}`);
     } else {
-      throw new Error(data.message || 'Registration failed');
+      const errMsg = data.message || (data.errors?.[0]?.msg) || 'Registration failed';
+      throw new Error(errMsg);
     }
   };
 

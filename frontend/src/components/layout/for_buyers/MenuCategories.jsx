@@ -4,13 +4,13 @@ const MenuCategories = ({ active, setActive }) => {
   const categories = Object.keys(buyerMenu);
 
   return (
-    <ul className="space-y-4 text-sm font-semibold uppercase tracking-wide text-gray-700">
+    <ul className="space-y-3 text-sm font-semibold uppercase tracking-wide">
       {categories.map((cat) => (
         <li
           key={cat}
           onMouseEnter={() => setActive(cat)}
-          className={`cursor-pointer transition-colors ${
-            active === cat ? "text-blue-600" : "text-gray-800 hover:text-blue-600"
+          className={`cursor-pointer rounded-lg px-3 py-2 transition-colors ${
+            active === cat ? "bg-sky-100 text-sky-700" : "text-slate-700 hover:bg-slate-100 hover:text-sky-600"
           }`}
         >
           {cat}

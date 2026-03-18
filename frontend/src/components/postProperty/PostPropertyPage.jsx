@@ -7,9 +7,10 @@ import FAQSection from "./FAQSection";
 
 const PostPropertyPage = () => {
   return (
-    <div>
-      <section className="bg-gradient-to-b from-blue-50 to-white">
-        <div className="mx-auto grid max-w-6xl items-start gap-8 px-6 py-12 md:grid-cols-[1.2fr_0.8fr]">
+    <div className="min-h-screen bg-slate-50/50">
+      {/* Hero + Form Section */}
+      <section className="relative overflow-hidden post-property-gradient post-property-pattern">
+        <div className="mx-auto grid max-w-6xl items-start gap-10 px-6 py-16 md:grid-cols-[1.2fr_0.8fr] lg:gap-14">
           <HeroSection />
           <PropertyPostForm />
         </div>

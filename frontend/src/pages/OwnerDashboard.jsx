@@ -27,7 +27,7 @@ const OwnerDashboard = () => {
                 <h2 className="mb-4 text-xl font-bold">Add New Property</h2>
                 <AddProperty />
             </div>
-
+z
             <div className="mt-8">
                 <h2 className="mb-4 text-xl font-bold">Your Properties</h2>
                 {loading ? (
@@ -35,6 +35,7 @@ const OwnerDashboard = () => {
                 ) : properties.length === 0 ? (
                     <p>No properties added yet.</p>
                 ) : (
+                    
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                         {properties.map(property => (
                             <div key={property._id} className="p-4 bg-white rounded-lg shadow-md">
@@ -42,7 +43,7 @@ const OwnerDashboard = () => {
                                 <p className="text-sm text-gray-600">{property.location}</p>
                                 <div className="flex items-center justify-between mt-2">
                                     <p className="font-bold text-blue-600">${property.price}</p>
-                                    <p className="text-xs px-2 py-1 bg-gray-100 rounded">{property.type}</p>
+                                    <p className="px-2 py-1 text-xs bg-gray-100 rounded">{property.type}</p>
                                 </div>
                                 {property.images && property.images.length > 0 && (
                                     <img src={`http://localhost:5000/${property.images[0]}`} alt={property.title} className="object-cover w-full h-32 mt-2" />
@@ -54,17 +55,17 @@ const OwnerDashboard = () => {
                                 </div>
 
                                 {property.inquiries && property.inquiries.length > 0 && (
-                                    <div className="mt-3 border-t pt-3">
+                                    <div className="pt-3 mt-3 border-t">
                                         <h4 className="font-semibold">Inquiries</h4>
-                                        <ul className="space-y-2 mt-2">
+                                        <ul className="mt-2 space-y-2">
                                             {property.inquiries.map((inq, idx) => (
-                                                <li key={idx} className="p-2 bg-gray-50 rounded">
-                                                    <div className="flex justify-between items-start">
+                                                <li key={idx} className="p-2 rounded bg-gray-50">
+                                                    <div className="flex items-start justify-between">
                                                         <div>
                                                             <p className="font-medium">{inq.name || 'Anonymous'}</p>
                                                             <p className="text-sm text-gray-600">{inq.message}</p>
                                                             {inq.email && (
-                                                                <p className="text-sm mt-1">Contact: <a href={`mailto:${inq.email}`} className="text-blue-600 underline">{inq.email}</a></p>
+                                                                <p className="mt-1 text-sm">Contact: <a href={`mailto:${inq.email}`} className="text-blue-600 underline">{inq.email}</a></p>
                                                             )}
                                                         </div>
                                                         <div className="text-xs text-gray-500">
@@ -86,3 +87,8 @@ const OwnerDashboard = () => {
 };
 
 export default OwnerDashboard;
+
+
+
+
+
